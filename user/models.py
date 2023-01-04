@@ -5,9 +5,13 @@ class UserManager(BaseUserManager):
     def create_user(self, email, nickname, password=None):
         if not email:
             raise ValueError("Users must have an email address")
+        if not nickname:
+            raise ValueError("Users must have a nickname")
+
         user = self.model(
-            email=email, 
-            nickname = nickname
+            email=self.normalize_email(email), 
+            nickname = nickname,
+
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -49,7 +53,7 @@ class User(AbstractBaseUser):
     )
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELD = ['nickname',]
+    REQUIRED_FIELDS = ['nickname']
 
     objects = UserManager()
 
