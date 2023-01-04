@@ -1,5 +1,8 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
+from django.core.validators import MinLengthValidator
+
+USER_NICKNAME_LENGTH_RANGE = (4, 15)
 
 class UserManager(BaseUserManager):
     def create_user(self, email, nickname, password=None):
@@ -11,7 +14,6 @@ class UserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email), 
             nickname = nickname,
-
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -38,7 +40,10 @@ class User(AbstractBaseUser):
 
     nickname = models.CharField(
         verbose_name='Nickname',
-        max_length=30,
+        validators=[
+            MinLengthValidator(USER_NICKNAME_LENGTH_RANGE[0]),
+        ], 
+        max_length=USER_NICKNAME_LENGTH_RANGE[1],
         unique=True
     )
 
