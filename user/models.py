@@ -1,13 +1,19 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
+from django.core.validators import MinLengthValidator
+
+USER_NICKNAME_LENGTH_RANGE = (4, 15)
 
 class UserManager(BaseUserManager):
     def create_user(self, email, nickname, password=None):
         if not email:
             raise ValueError("Users must have an email address")
+        if not nickname:
+            raise ValueError("Users must have a nickname")
+
         user = self.model(
-            email=email, 
-            nickname = nickname
+            email=self.normalize_email(email), 
+            nickname = nickname,
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -34,7 +40,10 @@ class User(AbstractBaseUser):
 
     nickname = models.CharField(
         verbose_name='Nickname',
-        max_length=30,
+        validators=[
+            MinLengthValidator(USER_NICKNAME_LENGTH_RANGE[0]),
+        ], 
+        max_length=USER_NICKNAME_LENGTH_RANGE[1],
         unique=True
     )
 
@@ -49,7 +58,7 @@ class User(AbstractBaseUser):
     )
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELD = ['nickname',]
+    REQUIRED_FIELDS = ['nickname']
 
     objects = UserManager()
 
