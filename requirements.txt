@@ -3,3 +3,5 @@ djangorestframework
 django-dotenv
 django-debug-toolbar
 PyMySQL
+djangorestframework-simplejwt
+mysqlclient==2.1.0
